@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOXIC QUANTUM - Dynamic Goal Engine</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@500;600;700&family=Hind+Siliguri:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #030611;
+            --panel-bg: rgba(10, 15, 29, 0.85);
+            --toxic-green: #00ff66;
+            --toxic-cyan: #00f0ff;
+            --toxic-purple: #9d00ff;
+            --toxic-rose: #ff0055;
+            --toxic-gold: #ffb700;
+            --text-main: #f1f5f9;
+            --text-dim: #94a3b8;
+            --border-glow: rgba(0, 255, 102, 0.3);
+            --border-cyan: rgba(0, 240, 255, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Hind Siliguri', 'Rajdhani', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 50% 10%, rgba(157, 0, 255, 0.12) 0%, transparent 60%),
+                radial-gradient(circle at 90% 80%, rgba(0, 255, 102, 0.08) 0%, transparent 50%),
+                linear-gradient(rgba(0, 240, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 240, 255, 0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 30px 30px, 30px 30px;
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 15px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-glow);
+            box-shadow: 0 0 25px rgba(0, 255, 102, 0.15);
+            border-radius: 14px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(12px);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .toxic-core {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--toxic-green) 0%, var(--toxic-purple) 100%);
+            border: 2px solid var(--toxic-green);
+            box-shadow: 0 0 20px var(--toxic-green);
+            animation: corePulse 2s infinite ease-in-out;
+            flex-shrink: 0;
+        }
+
+        @keyframes corePulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 15px var(--toxic-green); }
+            50% { transform: scale(1.08); box-shadow: 0 0 30px var(--toxic-cyan), 0 0 10px var(--toxic-purple); }
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            letter-spacing: 2px;
+            background: linear-gradient(90deg, #fff, var(--toxic-green), var(--toxic-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 15px rgba(0, 255, 102, 0.4);
+        }
+
+        .hud-status {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.75rem;
+        }
+
+        .status-badge {
+            padding: 8px 12px;
+            border-radius: 8px;
+            background: rgba(0, 255, 102, 0.05);
+            border: 1px solid var(--border-glow);
+            color: var(--toxic-green);
+        }
+
+        /* Promo Cards Grid */
+        .promo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .promo-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-cyan);
+            border-radius: 14px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 14px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.05);
+        }
+
+        .promo-card.vip {
+            border-color: var(--toxic-purple);
+            box-shadow: 0 0 15px rgba(157, 0, 255, 0.15);
+        }
+
+        .promo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .promo-card h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.05rem;
+            color: var(--toxic-cyan);
+            letter-spacing: 1px;
+            line-height: 1.3;
+        }
+
+        .promo-card.vip h3 {
+            color: var(--toxic-gold);
+        }
+
+        .lang-toggle-btn {
+            background: rgba(0, 240, 255, 0.1);
+            border: 1px solid var(--toxic-cyan);
+            color: var(--toxic-cyan);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .lang-toggle-btn:hover {
+            background: var(--toxic-cyan);
+            color: var(--bg-dark);
+            box-shadow: 0 0 10px var(--toxic-cyan);
+        }
+
+        .promo-card p {
+            font-size: 1rem;
+            line-height: 1.55;
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        .promo-btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .btn-link {
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 12px 14px;
+            border-radius: 8px;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            flex: 1;
+            min-width: 140px;
+        }
+
+        .btn-telegram {
+            background: rgba(0, 240, 255, 0.15);
+            border: 1px solid var(--toxic-cyan);
+            color: var(--toxic-cyan);
+        }
+
+        .btn-telegram:hover {
+            background: var(--toxic-cyan);
+            color: var(--bg-dark);
+            box-shadow: 0 0 15px var(--toxic-cyan);
+        }
+
+        .btn-quotex {
+            background: rgba(0, 255, 102, 0.15);
+            border: 1px solid var(--toxic-green);
+            color: var(--toxic-green);
+        }
+
+        .btn-quotex:hover {
+            background: var(--toxic-green);
+            color: var(--bg-dark);
+            box-shadow: 0 0 15px var(--toxic-green);
+        }
+
+        .btn-admin {
+            background: rgba(157, 0, 255, 0.2);
+            border: 1px solid var(--toxic-purple);
+            color: #fff;
+        }
+
+        .btn-admin:hover {
+            background: var(--toxic-purple);
+            box-shadow: 0 0 15px var(--toxic-purple);
+        }
+
+        /* Controls Section */
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 15px;
+            background: var(--panel-bg);
+            padding: 20px;
+            border-radius: 14px;
+            border: 1px solid var(--border-cyan);
+            margin-bottom: 20px;
+            backdrop-filter: blur(12px);
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-dim);
+            font-weight: 700;
+        }
+
+        input, select {
+            background: rgba(3, 6, 17, 0.9);
+            border: 1px solid var(--border-cyan);
+            padding: 10px 12px;
+            border-radius: 8px;
+            color: var(--toxic-cyan);
+            font-size: 1rem;
+            font-weight: 700;
+            outline: none;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--toxic-green);
+            box-shadow: 0 0 15px rgba(0, 255, 102, 0.4);
+        }
+
+        .calculated-badge-box {
+            background: rgba(0, 255, 102, 0.05);
+            border: 1px dashed var(--toxic-green);
+            border-radius: 8px;
+            padding: 8px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-height: 44px;
+            justify-content: center;
+        }
+
+        .calculated-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            font-weight: 700;
+        }
+
+        .calculated-value {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            color: var(--toxic-green);
+            font-size: 0.9rem;
+        }
+
+        .btn-container {
+            grid-column: 1 / -1;
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn-toxic {
+            flex: 2;
+            background: linear-gradient(135deg, rgba(0, 255, 102, 0.2), rgba(157, 0, 255, 0.3));
+            border: 1px solid var(--toxic-green);
+            color: #fff;
+            font-family: 'Orbitron', sans-serif;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(0, 255, 102, 0.2);
+        }
+
+        .btn-toxic:hover {
+            background: linear-gradient(135deg, var(--toxic-green), var(--toxic-cyan));
+            color: var(--bg-dark);
+            box-shadow: 0 0 30px var(--toxic-green);
+        }
+
+        .btn-reset {
+            flex: 1;
+            background: rgba(255, 0, 85, 0.15);
+            border: 1px solid var(--toxic-rose);
+            color: var(--toxic-rose);
+            font-family: 'Orbitron', sans-serif;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+        }
+
+        .btn-reset:hover {
+            background: var(--toxic-rose);
+            color: #fff;
+            box-shadow: 0 0 20px var(--toxic-rose);
+        }
+
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-glow);
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .card h4 {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            margin-bottom: 6px;
+            letter-spacing: 1px;
+        }
+
+        .card p {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--toxic-green);
+        }
+
+        .table-container {
+            background: var(--panel-bg);
+            border-radius: 14px;
+            border: 1px solid var(--border-glow);
+            overflow-x: auto;
+            backdrop-filter: blur(12px);
+            width: 100%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+            vertical-align: middle;
+            min-width: 950px;
+        }
+
+        th {
+            background: rgba(0, 255, 102, 0.08);
+            padding: 14px 10px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            color: var(--toxic-green);
+            border-bottom: 1px solid var(--border-glow);
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 12px 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.95rem;
+            white-space: nowrap;
+            vertical-align: middle;
+        }
+
+        tr:hover {
+            background: rgba(0, 240, 255, 0.04);
+        }
+
+        .status-win { color: var(--toxic-green); font-weight: 700; }
+        .status-loss { color: var(--toxic-rose); font-weight: 700; }
+        .status-pending { color: var(--toxic-gold); font-weight: 700; }
+
+        .action-cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .result-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            justify-content: center;
+        }
+
+        .sign-toggle {
+            background: rgba(3, 6, 17, 0.9);
+            border: 1px solid var(--border-cyan);
+            color: var(--toxic-green);
+            font-weight: 900;
+            font-size: 1rem;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+        }
+
+        .sign-toggle.negative {
+            color: var(--toxic-rose);
+            border-color: var(--toxic-rose);
+        }
+
+        .input-actual {
+            width: 75px;
+            padding: 6px 8px;
+            font-size: 0.85rem;
+            text-align: center;
+            border-radius: 6px;
+            background: rgba(3, 6, 17, 0.9);
+            border: 1px solid var(--border-cyan);
+            color: var(--toxic-cyan);
+        }
+
+        .btn-action {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        .btn-win { background: rgba(0, 255, 102, 0.2); color: var(--toxic-green); border: 1px solid var(--toxic-green); }
+        .btn-win:hover { background: var(--toxic-green); color: #000; }
+        
+        .btn-loss { background: rgba(255, 0, 85, 0.2); color: var(--toxic-rose); border: 1px solid var(--toxic-rose); }
+        .btn-loss:hover { background: var(--toxic-rose); color: #fff; }
+
+        .date-badge {
+            font-size: 0.7rem;
+            color: var(--toxic-cyan);
+            background: rgba(0, 240, 255, 0.1);
+            padding: 2px 5px;
+            border-radius: 4px;
+            margin-left: 4px;
+        }
+
+        /* Custom Modal System */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(3, 6, 17, 0.85);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-box {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-cyan);
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.2);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 440px;
+            padding: 25px;
+            text-align: center;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-box {
+            transform: scale(1);
+        }
+
+        .modal-box.danger {
+            border-color: var(--toxic-rose);
+            box-shadow: 0 0 30px rgba(255, 0, 85, 0.25);
+        }
+
+        .modal-icon { font-size: 2.5rem; margin-bottom: 12px; }
+        .modal-title { font-family: 'Orbitron', sans-serif; font-size: 1.25rem; color: var(--toxic-cyan); margin-bottom: 10px; letter-spacing: 1px; }
+        .modal-box.danger .modal-title { color: var(--toxic-rose); }
+        .modal-desc { font-size: 1rem; line-height: 1.5; color: var(--text-main); margin-bottom: 22px; }
+        .modal-actions { display: flex; gap: 12px; justify-content: center; }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            transition: all 0.25s ease;
+            flex: 1;
+        }
+
+        .modal-btn-confirm { background: rgba(255, 0, 85, 0.2); border: 1px solid var(--toxic-rose); color: var(--toxic-rose); }
+        .modal-btn-confirm:hover { background: var(--toxic-rose); color: #fff; box-shadow: 0 0 15px var(--toxic-rose); }
+        .modal-btn-primary { background: rgba(0, 255, 102, 0.2); border: 1px solid var(--toxic-green); color: var(--toxic-green); }
+        .modal-btn-primary:hover { background: var(--toxic-green); color: #000; box-shadow: 0 0 15px var(--toxic-green); }
+        .modal-btn-cancel { background: rgba(148, 163, 184, 0.1); border: 1px solid var(--text-dim); color: var(--text-dim); }
+        .modal-btn-cancel:hover { background: rgba(148, 163, 184, 0.3); color: #fff; }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 1.4rem; }
+            header { padding: 15px; }
+            .controls-grid { grid-template-columns: 1fr; }
+            .dashboard-cards { grid-template-columns: repeat(2, 1fr); }
+            .btn-container { flex-direction: column; }
+            .promo-btn-group { flex-direction: column; }
+            .promo-card p { font-size: 0.95rem; }
+        }
+
+        @media (max-width: 480px) {
+            .dashboard-cards { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <div class="brand">
+                <div class="toxic-core"></div>
+                <div>
+                    <h1>TOXIC QUANTUM</h1>
+                    <p style="font-size: 0.8rem; color: var(--text-dim); letter-spacing: 1px;">DYNAMIC GOAL AUTO-CALCULATOR ENGINE</p>
+                </div>
+            </div>
+            <div class="hud-status">
+                <div class="status-badge">TRADE MODE: <span style="color: var(--toxic-cyan);">BINARY</span></div>
+                <div class="status-badge">OWNER: <span style="color: var(--toxic-green);">TRADER BUDDY</span></div>
+            </div>
+        </header>
+
+        <!-- Dynamic Promo Cards -->
+        <section class="promo-grid">
+            <div class="promo-card">
+                <div class="promo-header">
+                    <h3>FREE DAILY SIGNALS</h3>
+                    <button class="lang-toggle-btn" onclick="toggleLanguage('card1')">EN / BN</button>
+                </div>
+                <div>
+                    <p id="card1Text">কোটেক্স (Quotex)-এর জন্য দৈনিক ফ্রি সিগন্যাল পেতে এবং আপনার প্রোফাইল তৈরি করে চার্টটি সম্পূর্ণ করতে আমাদের টেলিগ্রাম চ্যানেলে যুক্ত হন।</p>
+                </div>
+                <div class="promo-btn-group">
+                    <a href="https://t.me/tbtrader728" target="_blank" class="btn-link btn-telegram">JOIN TELEGRAM CHANNEL</a>
+                </div>
+            </div>
+
+            <div class="promo-card vip">
+                <div class="promo-header">
+                    <h3>VIP MEMBERSHIP & TOXIC PRO AI BOT</h3>
+                    <button class="lang-toggle-btn" onclick="toggleLanguage('card2')">EN / BN</button>
+                </div>
+                <div>
+                    <p id="card2Text">আমাদের VIP মেম্বারশিপ গ্রুপে জয়েন হয়ে এক্সট্রা প্রফিট, মাল্টিপল উইন এবং হাই একুরেসি পেতে—এবং পরবর্তী ক্যান্ডেল প্রেডিকশনের জন্য আমাদের <strong>TOXIC PRO AI BOT</strong> পেতে আপনার আগের কোটেক্স অ্যাকাউন্টটি ডিলিট করুন। এরপর শুধুমাত্র আমাদের দেওয়া লিঙ্ক ব্যবহার করে একটি নতুন কোটেক্স অ্যাকাউন্ট খুলুন এবং সর্বনিম্ন $10 ডিপোজিট করে টেলিগ্রামে এডমিনকে আপনার ট্রেডার আইডি (Trader ID) পাঠান। এডমিন আপনাকে অটোমেটিক VIP গ্রুপে এড করে নেবেন।</p>
+                </div>
+                <div class="promo-btn-group">
+                    <a href="https://broker-qx.pro/sign-up/?lid=2291702" target="_blank" class="btn-link btn-quotex">CREATE QUOTEX ACCOUNT</a>
+                    <a href="https://t.me/Toxictrader017" target="_blank" class="btn-link btn-admin">SEND TRADER ID TO ADMIN</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Smart Goal Controls -->
+        <section class="controls-grid">
+            <div class="input-group">
+                <label>Starting Capital ($)</label>
+                <input type="number" id="capitalInput" value="100" min="10" oninput="updateGoalPreview()">
+            </div>
+            <div class="input-group">
+                <label>Trading Duration</label>
+                <select id="durationSelect" onchange="updateGoalPreview()">
+                    <option value="10">10 Days Micro-Cycle</option>
+                    <option value="30" selected>1 Month (30 Days)</option>
+                    <option value="90">3 Months (90 Days)</option>
+                    <option value="180">6 Months (180 Days)</option>
+                    <option value="365">1 Year (365 Days)</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Target Ending Balance ($)</label>
+                <input type="number" id="targetBalanceInput" value="500" min="11" oninput="updateGoalPreview()">
+            </div>
+            <div class="input-group">
+                <label>Auto-Calculated Metrics</label>
+                <div class="calculated-badge-box">
+                    <div class="calculated-row">
+                        <span>Daily Target:</span>
+                        <span class="calculated-value" id="calcTpDisplay">0.00% / Day</span>
+                    </div>
+                    <div class="calculated-row">
+                        <span>Daily StopLoss:</span>
+                        <span class="calculated-value" style="color: var(--toxic-rose);" id="calcSlDisplay">0.00% / Day</span>
+                    </div>
+                </div>
+            </div>
+            <div class="btn-container">
+                <button class="btn-toxic" onclick="createNewChartByUser()">EXECUTE TOXIC PROTOCOL</button>
+                <button class="btn-reset" onclick="confirmResetChart()">RESET / NEW CHART</button>
+            </div>
+        </section>
+
+        <section class="dashboard-cards">
+            <div class="card">
+                <h4>Current Balance</h4>
+                <p id="dashBalance">$0.00</p>
+            </div>
+            <div class="card">
+                <h4>Net Profit/Loss</h4>
+                <p id="dashProfit">$0.00</p>
+            </div>
+            <div class="card">
+                <h4>Completed Targets</h4>
+                <p id="dashProgress">0 / 0</p>
+            </div>
+            <div class="card">
+                <h4>Base Trade (Whole $)</h4>
+                <p id="dashNextTrade">$0</p>
+            </div>
+            <div class="card">
+                <h4>MTG 1-Step (Whole $)</h4>
+                <p id="dashNextMtg" style="color: var(--toxic-gold);">$0</p>
+            </div>
+        </section>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Day</th>
+                        <th>Start Balance</th>
+                        <th>Target Profit (TP)</th>
+                        <th>Stop Loss (SL)</th>
+                        <th>Base Trade</th>
+                        <th>MTG 1-Step</th>
+                        <th>Actual Outcome ($)</th>
+                        <th>End Balance</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="scheduleBody">
+                    <!-- Data rendered dynamically -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Custom Modal Container -->
+    <div class="modal-overlay" id="customModal">
+        <div class="modal-box" id="modalBox">
+            <div class="modal-icon" id="modalIcon">⚠️</div>
+            <div class="modal-title" id="modalTitle">SYSTEM CONFIRMATION</div>
+            <div class="modal-desc" id="modalDesc">Are you sure you want to proceed with this action?</div>
+            <div class="modal-actions" id="modalActions">
+                <button class="modal-btn modal-btn-cancel" id="modalCancelBtn">CANCEL</button>
+                <button class="modal-btn modal-btn-confirm" id="modalConfirmBtn">CONFIRM</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let tradingSchedule = [];
+        let inputSigns = {}; 
+        const STORAGE_KEY = 'TOXIC_QUANTUM_CHART_DATA';
+        const CONFIG_KEY = 'TOXIC_QUANTUM_CONFIG';
+
+        const promoTexts = {
+            card1: {
+                bn: "কোটেক্স (Quotex)-এর জন্য দৈনিক ফ্রি সিগন্যাল পেতে এবং আপনার প্রোফাইল তৈরি করে চার্টটি সম্পূর্ণ করতে আমাদের টেলিগ্রাম চ্যানেলে যুক্ত হন।",
+                en: "Join our Telegram channel to get daily free signals for Quotex, create your profile, and complete your trade schedule."
+            },
+            card2: {
+                bn: "আমাদের VIP মেম্বারশিপ গ্রুপে জয়েন হয়ে এক্সট্রা প্রফিট, মাল্টিপল উইন এবং হাই একুরেসি পেতে—এবং পরবর্তী ক্যান্ডেল প্রেডিকশনের জন্য আমাদের <strong>TOXIC PRO AI BOT</strong> পেতে আপনার আগের কোটেক্স অ্যাকাউন্টটি ডিলিট করুন। এরপর শুধুমাত্র আমাদের দেওয়া লিঙ্ক ব্যবহার করে একটি নতুন কোটেক্স অ্যাকাউন্ট খুলুন এবং সর্বনিম্ন $10 ডিপোজিট করে টেলিগ্রামে এডমিনকে আপনার ট্রেডার আইডি (Trader ID) পাঠান। এডমিন আপনাকে অটোমেটিক VIP গ্রুপে এড করে নেবেন।",
+                en: "To join our VIP membership group for extra profit, multiple wins, high accuracy, and get our <strong>TOXIC PRO AI BOT</strong> for advance next candle predictions: Delete your previous Quotex account and create a new Quotex account using only our link. Deposit a minimum of $10, then send your Trader ID to the admin on Telegram. The admin will automatically add you to the VIP group and provide daily signals."
+            }
+        };
+
+        let cardLangs = { card1: 'bn', card2: 'bn' };
+
+        function toggleLanguage(cardKey) {
+            cardLangs[cardKey] = cardLangs[cardKey] === 'bn' ? 'en' : 'bn';
+            document.getElementById(`${cardKey}Text`).innerHTML = promoTexts[cardKey][cardLangs[cardKey]];
+        }
+
+        const synth = window.speechSynthesis;
+        let selectedMaleVoice = null;
+
+        function loadMaleVoice() {
+            if (!synth) return;
+            const voices = synth.getVoices();
+            selectedMaleVoice = voices.find(v => 
+                v.lang.includes('en') && (
+                    v.name.includes('David') || 
+                    v.name.includes('Mark') || 
+                    v.name.includes('George') || 
+                    v.name.includes('Male') ||
+                    v.name.includes('Google US English')
+                )
+            ) || voices.find(v => v.lang.includes('en'));
+        }
+
+        function speakAI(textEn) {
+            if (!synth) return;
+            synth.cancel();
+
+            const utterance = new SpeechSynthesisUtterance(textEn);
+            utterance.lang = 'en-US';
+            utterance.rate = 1.0;
+            utterance.pitch = 0.85;
+
+            if (selectedMaleVoice) {
+                utterance.voice = selectedMaleVoice;
+            }
+
+            synth.speak(utterance);
+        }
+
+        function showCustomModal({ icon = '⚠️', title = 'CONFIRMATION', desc = '', isDanger = false, confirmText = 'CONFIRM', cancelText = 'CANCEL', showCancel = true, onConfirm = null }) {
+            const overlay = document.getElementById('customModal');
+            const modalBox = document.getElementById('modalBox');
+            const iconEl = document.getElementById('modalIcon');
+            const titleEl = document.getElementById('modalTitle');
+            const descEl = document.getElementById('modalDesc');
+            const confirmBtn = document.getElementById('modalConfirmBtn');
+            const cancelBtn = document.getElementById('modalCancelBtn');
+
+            iconEl.innerText = icon;
+            titleEl.innerText = title;
+            descEl.innerHTML = desc;
+
+            if (isDanger) {
+                modalBox.classList.add('danger');
+                confirmBtn.className = 'modal-btn modal-btn-confirm';
+            } else {
+                modalBox.classList.remove('danger');
+                confirmBtn.className = 'modal-btn modal-btn-primary';
+            }
+
+            confirmBtn.innerText = confirmText;
+            cancelBtn.innerText = cancelText;
+
+            cancelBtn.style.display = showCancel ? 'inline-block' : 'none';
+            overlay.classList.add('active');
+
+            const close = () => {
+                overlay.classList.remove('active');
+                confirmBtn.onclick = null;
+                cancelBtn.onclick = null;
+            };
+
+            confirmBtn.onclick = () => {
+                close();
+                if (onConfirm) onConfirm();
+            };
+
+            cancelBtn.onclick = () => close();
+        }
+
+        function getTodayDateString() {
+            const d = new Date();
+            return d.toISOString().split('T')[0];
+        }
+
+        function getRequiredRate(currentBal, targetBal, remainingDays) {
+            if (remainingDays <= 0 || targetBal <= currentBal) {
+                return { tpPct: 0.5, slPct: 0.6 };
+            }
+            const dailyTpPct = (Math.pow(targetBal / currentBal, 1 / remainingDays) - 1) * 100;
+            const dailySlPct = dailyTpPct * 1.2;
+            return { tpPct: dailyTpPct, slPct: dailySlPct };
+        }
+
+        function calculateRates() {
+            const capital = parseFloat(document.getElementById('capitalInput').value) || 100;
+            const days = parseInt(document.getElementById('durationSelect').value) || 30;
+            const targetBalance = parseFloat(document.getElementById('targetBalanceInput').value) || (capital * 2);
+
+            return getRequiredRate(capital, targetBalance, days);
+        }
+
+        function updateGoalPreview() {
+            const { tpPct, slPct } = calculateRates();
+            document.getElementById('calcTpDisplay').innerText = `${tpPct.toFixed(2)}% / Day`;
+            document.getElementById('calcSlDisplay').innerText = `${slPct.toFixed(2)}% / Day`;
+        }
+
+        function saveToLocalStorage() {
+            const config = {
+                capital: document.getElementById('capitalInput').value,
+                duration: document.getElementById('durationSelect').value,
+                targetBalance: document.getElementById('targetBalanceInput').value
+            };
+            localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(tradingSchedule));
+        }
+
+        function loadFromLocalStorage() {
+            const savedConfig = localStorage.getItem(CONFIG_KEY);
+            const savedSchedule = localStorage.getItem(STORAGE_KEY);
+
+            if (savedConfig) {
+                const config = JSON.parse(savedConfig);
+                document.getElementById('capitalInput').value = config.capital;
+                document.getElementById('durationSelect').value = config.duration;
+                document.getElementById('targetBalanceInput').value = config.targetBalance || (config.capital * 2);
+            }
+
+            updateGoalPreview();
+
+            if (savedSchedule) {
+                const parsed = JSON.parse(savedSchedule);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    tradingSchedule = parsed;
+                    renderTable();
+                    updateDashboard();
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function confirmResetChart() {
+            showCustomModal({
+                icon: '☣️',
+                title: 'RESET PROTOCOL',
+                desc: 'আপনি কি নিশ্চিত যে আপনি বর্তমান চার্টটি মুছে দিয়ে নতুন লক্ষ্যমাত্রা সেট করতে চান?',
+                isDanger: true,
+                confirmText: 'YES, RESET',
+                cancelText: 'NO, CANCEL',
+                onConfirm: () => {
+                    localStorage.removeItem(STORAGE_KEY);
+                    localStorage.removeItem(CONFIG_KEY);
+                    initializePlan(false);
+                    speakAI("Running chart reset successfully.");
+                }
+            });
+        }
+
+        function createNewChartByUser() {
+            const hasExisting = localStorage.getItem(STORAGE_KEY);
+            if (hasExisting) {
+                showCustomModal({
+                    icon: '⚠️',
+                    title: 'OVERWRITE EXISTING CHART?',
+                    desc: 'আপনার একটি সেভ হওয়া চার্ট রয়েছে। আপনি কি এটিকে মুছে নতুন করে চার্ট তৈরি করতে চান?',
+                    isDanger: true,
+                    confirmText: 'YES, CREATE NEW',
+                    cancelText: 'CANCEL',
+                    onConfirm: () => {
+                        initializePlan(true);
+                    }
+                });
+            } else {
+                initializePlan(true);
+            }
+        }
+
+        function initializePlan(isUserAction = true) {
+            const capital = parseFloat(document.getElementById('capitalInput').value);
+            const days = parseInt(document.getElementById('durationSelect').value);
+            const targetBalance = parseFloat(document.getElementById('targetBalanceInput').value);
+
+            if (isNaN(capital) || capital <= 0 || isNaN(targetBalance) || targetBalance <= capital) {
+                showCustomModal({
+                    icon: '🚨',
+                    title: 'INVALID TARGET GOAL',
+                    desc: 'দয়া করে আপনার টার্গেট ব্যালেন্স ক্যাপিটাল অপেক্ষা বেশি প্রদান করুন।',
+                    showCancel: false,
+                    confirmText: 'OK'
+                });
+                return;
+            }
+
+            const { tpPct, slPct } = getRequiredRate(capital, targetBalance, days);
+
+            tradingSchedule = [];
+            let currentBalance = capital;
+
+            for (let i = 1; i <= days; i++) {
+                const dayPlan = calculateDayPlan(i, currentBalance, tpPct, slPct);
+                tradingSchedule.push(dayPlan);
+                currentBalance = dayPlan.endBalance;
+            }
+
+            renderTable();
+            updateDashboard();
+            saveToLocalStorage();
+
+            if (isUserAction) {
+                speakAI(`New target protocol active. Goal is ${targetBalance} dollars.`);
+            }
+        }
+
+        function calculateDayPlan(dayNumber, startBalance, tpPct, slPct) {
+            const tpAmount = startBalance * (tpPct / 100);
+            const slAmount = startBalance * (slPct / 100);
+            
+            let baseTrade = Math.max(1, Math.ceil(tpAmount * 0.45));
+            let mtgTrade = Math.max(2, Math.ceil(baseTrade * 2.2));
+
+            return {
+                day: dayNumber,
+                startBalance: startBalance,
+                tpAmount: tpAmount,
+                slAmount: slAmount,
+                baseTrade: baseTrade,
+                mtgTrade: mtgTrade,
+                actualResult: null,
+                endBalance: startBalance + tpAmount,
+                status: 'PENDING',
+                completedDate: null
+            };
+        }
+
+        function toggleSign(index) {
+            const btn = document.getElementById(`signBtn_${index}`);
+            if (!inputSigns[index] || inputSigns[index] === '+') {
+                inputSigns[index] = '-';
+                btn.innerText = '-';
+                btn.classList.add('negative');
+            } else {
+                inputSigns[index] = '+';
+                btn.innerText = '+';
+                btn.classList.remove('negative');
+            }
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('scheduleBody');
+            tbody.innerHTML = '';
+
+            tradingSchedule.forEach((plan, index) => {
+                const tr = document.createElement('tr');
+
+                let statusBadge = `<span class="status-pending">PENDING</span>`;
+                if (plan.status === 'ACHIEVED') {
+                    statusBadge = `<span class="status-win">WIN <span class="date-badge">${plan.completedDate || ''}</span></span>`;
+                }
+                if (plan.status === 'FAILED') {
+                    statusBadge = `<span class="status-loss">LOSS <span class="date-badge">${plan.completedDate || ''}</span></span>`;
+                }
+
+                const currentSign = inputSigns[index] || '+';
+
+                tr.innerHTML = `
+                    <td><strong>Day ${plan.day}</strong></td>
+                    <td>$${plan.startBalance.toFixed(2)}</td>
+                    <td style="color: var(--toxic-green); font-weight:700;">+$${plan.tpAmount.toFixed(2)}</td>
+                    <td style="color: var(--toxic-rose); font-weight:700;">-$${plan.slAmount.toFixed(2)}</td>
+                    <td style="font-weight:700; color: var(--toxic-cyan);">$${plan.baseTrade}</td>
+                    <td style="color: var(--toxic-gold); font-weight:700;">$${plan.mtgTrade}</td>
+                    <td>
+                        ${plan.status === 'PENDING' ? `
+                            <div class="result-input-wrapper">
+                                <button type="button" class="sign-toggle ${currentSign === '-' ? 'negative' : ''}" id="signBtn_${index}" onclick="toggleSign(${index})">${currentSign}</button>
+                                <input type="number" class="input-actual" id="customAmount_${index}" placeholder="0.00" step="0.1" min="0">
+                            </div>
+                        ` : `<strong>${plan.actualResult >= 0 ? '+' : ''}$${plan.actualResult.toFixed(2)}</strong>`}
+                    </td>
+                    <td>$${plan.endBalance.toFixed(2)}</td>
+                    <td>${statusBadge}</td>
+                    <td>
+                        <div class="action-cell">
+                            ${plan.status === 'PENDING' ? `
+                                <button class="btn-action btn-win" onclick="submitDayResult(${index}, true)">WIN</button>
+                                <button class="btn-action btn-loss" onclick="submitDayResult(${index}, false)">LOSS</button>
+                            ` : `<span style="color: var(--text-dim); font-size: 0.8rem;">DONE</span>`}
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function submitDayResult(index, isWinButton) {
+            const targetBalance = parseFloat(document.getElementById('targetBalanceInput').value) || 30000;
+            const totalDays = tradingSchedule.length;
+
+            let plan = tradingSchedule[index];
+            const customInput = document.getElementById(`customAmount_${index}`).value;
+            const sign = inputSigns[index] || '+';
+            const todayStr = getTodayDateString();
+
+            let actualChange = 0;
+
+            if (customInput !== '' && !isNaN(parseFloat(customInput))) {
+                let parsedVal = Math.abs(parseFloat(customInput));
+                actualChange = (sign === '-') ? -parsedVal : parsedVal;
+            } else {
+                actualChange = isWinButton ? plan.tpAmount : -plan.slAmount;
+            }
+
+            plan.actualResult = actualChange;
+            plan.completedDate = todayStr;
+
+            if (actualChange >= 0) {
+                plan.status = 'ACHIEVED';
+                plan.endBalance = plan.startBalance + actualChange;
+                speakAI(`Day ${plan.day} win recorded.`);
+            } else {
+                plan.status = 'FAILED';
+                plan.endBalance = Math.max(0, plan.startBalance + actualChange);
+                speakAI(`Day ${plan.day} loss recorded. Schedule adjusted.`);
+            }
+
+            let runningBalance = plan.endBalance;
+            let remainingDays = totalDays - (index + 1);
+
+            const { tpPct, slPct } = getRequiredRate(runningBalance, targetBalance, remainingDays);
+
+            for (let i = index + 1; i < totalDays; i++) {
+                if (tradingSchedule[i].status === 'PENDING') {
+                    const newPlan = calculateDayPlan(i + 1, runningBalance, tpPct, slPct);
+                    tradingSchedule[i] = newPlan;
+                    runningBalance = newPlan.endBalance;
+                } else {
+                    runningBalance = tradingSchedule[i].endBalance;
+                }
+            }
+
+            renderTable();
+            updateDashboard();
+            saveToLocalStorage();
+        }
+
+        function updateDashboard() {
+            const startCapital = parseFloat(document.getElementById('capitalInput').value);
+            
+            let completedPlans = tradingSchedule.filter(s => s.status !== 'PENDING');
+            let currentBalance = startCapital;
+
+            if (completedPlans.length > 0) {
+                currentBalance = completedPlans[completedPlans.length - 1].endBalance;
+            }
+
+            const netProfit = currentBalance - startCapital;
+            const nextPending = tradingSchedule.find(s => s.status === 'PENDING') || tradingSchedule[tradingSchedule.length - 1];
+
+            document.getElementById('dashBalance').innerText = `$${currentBalance.toFixed(2)}`;
+            document.getElementById('dashProfit').innerText = `${netProfit >= 0 ? '+' : ''}$${netProfit.toFixed(2)}`;
+            document.getElementById('dashProfit').style.color = netProfit >= 0 ? 'var(--toxic-green)' : 'var(--toxic-rose)';
+            document.getElementById('dashProgress').innerText = `${completedPlans.length} / ${tradingSchedule.length}`;
+            
+            if (nextPending) {
+                document.getElementById('dashNextTrade').innerText = `$${nextPending.baseTrade}`;
+                document.getElementById('dashNextMtg').innerText = `$${nextPending.mtgTrade}`;
+            }
+        }
+
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = loadMaleVoice;
+        }
+
+        window.onload = () => { 
+            loadMaleVoice();
+            const loaded = loadFromLocalStorage();
+            if (!loaded) {
+                initializePlan(false); 
+            }
+        };
+    </script>
+</body>
+</html>
